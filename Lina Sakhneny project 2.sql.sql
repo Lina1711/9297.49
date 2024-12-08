@@ -1,6 +1,12 @@
 USE AdventureWorks2019
 
 --1
+/*
+Write a query that displays information about products that have not been purchasedin the 
+Orders table. Show: ProductID, Name (ProductName), Color, ListPrice, Size. Sort the report 
+by ProductID.
+*/
+
 SELECT p.ProductID, p.name as Name , p.Color , p.ListPrice, p.Size
 FROM  [Production].[Product] AS p LEFT JOIN [Sales].[SalesOrderDetail] AS S
 ON s.ProductID = p.ProductID 
@@ -10,6 +16,12 @@ order by p.ProductID
 go
 
 --2
+/*
+Write a query that displays information about customers who have not placed any orders. 
+Show CustomerID, LastName of the customer, and sort the report by CustomerID in ascending order. 
+If the customer has no LastName or FirstName, display 'Unknown' instead of the name
+*/
+
 with cte 
 as 
 (select c.CustomerID
@@ -28,6 +40,12 @@ order by c.CustomerID
 go
 
 --3
+/*
+"Write a query that displays the details of the 10 customers who have placed the most orders. 
+Show CustomerID, FirstName, LastName, and the number of orders placed by the customers, 
+sorted in descending order
+*/
+
 with orders
 as
 (
@@ -45,6 +63,12 @@ ON C.PersonID = P.BusinessEntityID
 go
 
 --4
+/*
+Write a query that displays information about employees and their job titles 
+(FirstName, LastName, JobTitle, HireDate), along with the number of employees
+who hold the same job title as the employee
+*/
+
 select p.FirstName, p.LastName, JobTitle, HireDate, 
 	count(JobTitle)over(partition by jobtitle order by jobtitle) as CountOfTilte
 from [HumanResources].[Employee] as e
@@ -54,6 +78,12 @@ inner join [Person].[Person] as p
 go
 
 --5
+/*
+Write a query that displays for each customer the date of their most recent order and the date 
+of the order before that. Display: SalesOrderID, CustomerID, LastName, FirstName, the date of 
+the most recent order, and the date of the order before that
+*/
+
 with Orders
 as
 (
@@ -74,6 +104,13 @@ as
 	go
 
 --6
+/*
+Write a query that displays the total value of products in the most expensive order for each year.
+The query should show which customers the orders belong to. 
+Display: Order Date Year, Order Number, Customer's Last Name and First Name, and the total value
+of the order
+*/
+
 with orders as (
 	select sod.SalesOrderID, sum(sod.OrderQty* sod.UnitPrice*(1-sod.UnitPriceDiscount)) as total, YEAR(OrderDate) AS YEAR , CustomerID
 	from [Sales].[SalesOrderDetail] as sod 
@@ -100,6 +137,9 @@ max_order as (
 	go
 
 --7
+/*
+Display the number of orders made in each month of the year using a matrix
+*/
 select *
 from(select month(OrderDate) as Month, year (OrderDate) as year,SalesOrderID
 from [Sales].[SalesOrderHeader]) as o
@@ -109,6 +149,12 @@ order by month
 go
 
 --8
+/*
+Write a query that displays the total value of products in orders for each month of the year, 
+as well as the cumulative total for each year. Make sure the report is visually clear. 
+Include a row highlighting the yearly total.
+*/
+
 with sum_price as (
 	select 
 		year(orderdate) as Year,
@@ -146,6 +192,14 @@ order by year, cumsum, Month
 go
 
 --9
+/*
+Write a query that displays employees by their hire date within each department, 
+from the most recently hired to the longest employed. Display the following columns: 
+Department Name, Employee ID, Full Name, Hire Date, Employee's tenure in the company (in months), 
+Full Name and Hire Date of the employee hired before them, 
+and the number of days between the employee's hire date and the employee hired before them
+*/
+
 with Employees
 as
 (
@@ -172,6 +226,12 @@ order by DepartmentName, hiredate desc
 go
 
 --10
+/*
+Write a query that displays details of employees who work in the same department and were hired 
+on the same date. The employee details should be listed for each combination of hire date and 
+department number, sorted by the hire dates in descending order
+*/
+
 select hireDate, DepartmentID, string_agg(concat(dh.BusinessEntityID,' ', p.LastName, ' ', p.FirstName), ',') as TeamEmployees
 from [HumanResources].[Employee] as e inner join [Person].[Person] as p
 	on p.BusinessEntityID = e.BusinessEntityID
